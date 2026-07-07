@@ -1,0 +1,6 @@
+services:
+  open-webui:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ghcr.io/indieark/open-webui:local
