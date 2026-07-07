@@ -32,7 +32,11 @@
 - volume: `open-webui:/app/backend/data`
 - required env: `WEBUI_SECRET_KEY`
 - Ollama: `OLLAMA_BASE_URL=http://host.docker.internal:11434`
+- stream buffer env: `CHAT_STREAM_RESPONSE_CHUNK_MAX_BUFFER_SIZE=${CHAT_STREAM_RESPONSE_CHUNK_MAX_BUFFER_SIZE:-10485760}`
+- aiohttp read buffer env: `AIOHTTP_READ_BUFSIZE=${AIOHTTP_READ_BUFSIZE:-1048576}`
 - telemetry disabled: `SCARF_NO_ANALYTICS=true`, `DO_NOT_TRACK=true`, `ANONYMIZED_TELEMETRY=false`
+
+Portainer stack 的 Environment variables 只会用于 compose `${VAR}` 替换。变量必须出现在 `docker-compose.yml` 的 service `environment:` 下，才会进入容器运行时环境。`CHAT_STREAM_RESPONSE_CHUNK_MAX_BUFFER_SIZE` 和 `AIOHTTP_READ_BUFSIZE` 已在根层 compose 显式传入，默认值分别为 `10485760` 和 `1048576`。
 
 配置验证：
 

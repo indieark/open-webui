@@ -10,6 +10,8 @@ services:
     environment:
       WEBUI_SECRET_KEY: "${WEBUI_SECRET_KEY:?set WEBUI_SECRET_KEY in Portainer stack environment variables}"
       OLLAMA_BASE_URL: "http://host.docker.internal:11434"
+      CHAT_STREAM_RESPONSE_CHUNK_MAX_BUFFER_SIZE: "${CHAT_STREAM_RESPONSE_CHUNK_MAX_BUFFER_SIZE:-10485760}"
+      AIOHTTP_READ_BUFSIZE: "${AIOHTTP_READ_BUFSIZE:-1048576}"
       SCARF_NO_ANALYTICS: "true"
       DO_NOT_TRACK: "true"
       ANONYMIZED_TELEMETRY: "false"
