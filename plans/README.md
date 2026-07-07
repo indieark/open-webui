@@ -11,4 +11,4 @@
 
 | 日期 | 计划 | 状态 | 说明 |
 | --- | --- | --- | --- |
-| 2026-07-07 | [Open WebUI 兼容层与上游独立更新迁移计划](2026-07-07-open-webui-compat-layer-migration.md) | 结构迁移已执行 | 已将当前平铺 fork 改造为类似 `CLIProxyAPI` 的结构：上游源码独立跟踪在 `upstream/open-webui/`，根目录承载 IndieArk 兼容层、部署、同步脚本、文档与验证规则；本地验证和同步 no-op 已通过；未改测试环境 Portainer stack，未重启容器，未切私有镜像。 |
+| 2026-07-07 | [Open WebUI 兼容层与上游独立更新迁移计划](2026-07-07-open-webui-compat-layer-migration.md) | 结构迁移已执行 | 已将当前平铺 fork 改造为类似 `CLIProxyAPI` 的结构：上游源码独立跟踪在 `upstream/open-webui/`，根目录承载 IndieArk 兼容层、部署、同步脚本、文档与验证规则；本地验证和同步 no-op 已通过；已补齐 `00000-model/02-项目模板` 风格基础骨架；未改测试环境 Portainer stack，未重启容器，未切私有镜像。 |

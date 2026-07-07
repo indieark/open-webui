@@ -2,10 +2,12 @@
 
 你是在 `gadget/open-webui` 内协作的编码代理。默认使用简体中文。
 
+本仓库同时保留 `00000-model/02-项目模板` 风格的 [AGENT.md](AGENT.md)、`.agent/` 和 `.ai_memory/`。新会话应先读 `.ai_memory/1_project_context.md`、`.ai_memory/2_active_task.md`，再结合本文件和 [UPSTREAMS.md](UPSTREAMS.md) 工作。
+
 ## 仓库边界
 
 - `upstream/open-webui/` 是官方 `open-webui/open-webui` subtree，默认不直接改。
-- 根目录、`compat/`、`scripts/`、`docs/`、`plans/` 是 IndieArk 私库兼容层。
+- 根目录、`compat/`、`scripts/`、`docs/`、`plans/`、`.agent/`、`.ai_memory/` 是 IndieArk 私库兼容层和本地治理结构。
 - 能通过 Compose、环境变量、entrypoint、脚本、post-build patch、Open WebUI pipe/function 或 adapter 解决的问题，不进入 upstream subtree。
 - 必须修改 upstream subtree 时，先在 `docs/compatibility-layer.md` 登记例外，写清原因、文件、恢复规则和验证命令。
 
@@ -37,3 +39,5 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/sync-upstream.ps
 - 新计划放在 `plans/`，并同步更新 `plans/README.md`。
 - 当前部署事实以 `docs/deployment.md` 为准。
 - 上游同步规则以 `UPSTREAMS.md` 和 `docs/repository-maintenance.md` 为准。
+- 结构性变更后同步 `.ai_memory/`、`README.md`、`AGENT.md` / `AGENTS.md` 和 `docs/README.md`。
+- `MEMO.md` 是人类私人笔记，AI 不读取、不引用。
