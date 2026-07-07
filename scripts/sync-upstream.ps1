@@ -28,7 +28,7 @@ try {
         throw "Command failed: git status --porcelain"
     }
     if ($status) {
-        throw "工作区不干净，请先提交或暂存当前变更后再同步上游。"
+        throw "Working tree is dirty. Commit or stash current changes before syncing upstream."
     }
 
     git remote get-url upstream-open-webui *> $null
