@@ -10,7 +10,7 @@
 
 因此计划需要调整为“先保护已运行的 Portainer/Compose 私库兼容层，再谈上游源码独立跟踪”。如果后续要加部署默认值、搜索能力、OpenAI hosted web search 适配、Portainer/GHCR 规则或本地补丁，必须先把“上游源码”和“IndieArk 兼容层”分开，否则每次 upstream 更新都会把私库设计混在冲突里。
 
-本计划已经补齐为可执行 runbook，但本轮仍只修改计划文档，不执行目录搬迁、脚本改造、构建、部署或生产重启。
+本计划先补齐为可执行 runbook，随后已按用户确认直接在 `main` 上执行本地结构迁移。执行范围不包含测试环境 Portainer 写入、容器重启、镜像切换或生产部署。
 
 ## 当前结构
 
@@ -208,7 +208,7 @@ git diff -- docker-compose.yml
 
 ### P1：建立执行分支和计划保护点
 
-计划文件本身先作为第一笔可审计变更进入迁移分支，避免后续结构改动和计划改动混在一起。
+计划文件本身先作为第一笔可审计变更进入迁移历史，避免后续结构改动和计划改动混在一起。原计划建议迁移分支；实际执行按用户要求直接在 `main` 上完成。
 
 ```bash
 git switch main
@@ -540,6 +540,46 @@ git commit -m "chore: split open-webui upstream and compatibility layer"
 - 如果切到 `ghcr.io/indieark/open-webui:*`，必须先有镜像构建记录、image digest、回滚 tag 和本地 smoke 结果。
 - 不允许在没有数据备份确认的情况下改变 volume 名称、project 名或 container 内挂载路径。
 
+## 执行结果
+
+执行日期：2026-07-07
+
+已完成：
+
+- 已在 `main` 上提交计划：`a62457960`。
+- 已用 `git subtree add --prefix=upstream/open-webui upstream-open-webui main --squash` 导入官方上游。
+- 已确认 subtree squash commit 包含 `git-subtree-split: ecd48e2f718220a6400ecf49eafd4867a38feb10`。
+- 已清理根部上游源码文件，官方源码改由 `upstream/open-webui/` 独立承载。
+- 已落地根级 `README.md`、`AGENTS.md`、`UPSTREAMS.md`、`docs/`、`compat/`、`scripts/`、`Dockerfile`、`docker-compose.local.yml`。
+- 已保留根级 `docker-compose.yml` 的当前测试环境部署语义：`open-webui` service/container、`3000:8080`、`open-webui:/app/backend/data`、`ghcr.io/open-webui/open-webui:main`。
+- 已提交结构迁移：`84414adf4`。
+- 已修复 PowerShell 同步脚本在 Windows PowerShell 5.1 下的 UTF-8 无 BOM 中文字符串解析问题：`26c1e831c`。
+
+已验证：
+
+```bash
+WEBUI_SECRET_KEY=verify-placeholder docker compose config --quiet
+WEBUI_SECRET_KEY=verify-placeholder docker compose -f docker-compose.yml -f docker-compose.local.yml config --quiet
+git diff --check
+bash scripts/verify-compat.sh
+bash scripts/sync-upstream.sh
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/sync-upstream.ps1
+```
+
+验证结果：
+
+- `scripts/verify-compat.sh` 通过。
+- Bash 同步脚本输出 no-op：`No upstream delta: open-webui/open-webui@ecd48e2f718220a6400ecf49eafd4867a38feb10`。
+- PowerShell 同步脚本输出同样 no-op。
+
+未执行：
+
+- 未部署到测试环境。
+- 未重启 `open-webui` 容器。
+- 未修改 Portainer stack。
+- 未切换私有镜像。
+- 未启用 Web Search provider。
+
 ## 回滚方法
 
 代码结构回滚：
@@ -557,16 +597,16 @@ git commit -m "chore: split open-webui upstream and compatibility layer"
 
 ## 执行清单
 
-- [ ] P0 基线确认完成。
-- [ ] P1 执行分支和计划保护点完成。
-- [ ] P2 官方上游 subtree 导入完成，并确认 `git-subtree-split` 基线。
-- [ ] P3 根部上游文件清理完成，只保留私库兼容层。
-- [ ] P4 根级文档和维护规则骨架完成。
-- [ ] P5 当前 Portainer 部署语义恢复完成。
-- [ ] P6 Web Search / hosted tool 兼容层方案确认。
-- [ ] P7 同步脚本完成并能 no-op。
-- [ ] P8 本地验收链通过。
-- [ ] P9 测试环境只读核验和部署确认另行完成。
+- [x] P0 基线确认完成。
+- [x] P1 直接在 `main` 建立计划保护点完成。
+- [x] P2 官方上游 subtree 导入完成，并确认 `git-subtree-split` 基线。
+- [x] P3 根部上游文件清理完成，只保留私库兼容层。
+- [x] P4 根级文档和维护规则骨架完成。
+- [x] P5 当前 Portainer 部署语义恢复完成。
+- [x] P6 Web Search / hosted tool 兼容层方案确认。
+- [x] P7 同步脚本完成并能 no-op。
+- [x] P8 本地验收链通过。
+- [ ] P9 测试环境部署未执行；如需 redeploy 必须另行确认。
 
 ## 决策点
 
