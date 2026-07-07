@@ -2,11 +2,11 @@
 
 ## 执行状态
 
-本地部署层改造已完成：已新增 `deploy/open-webui/static/` 静态资源、`custom.css`、`loader.js`、`manifest.json`，并在根层 `docker-compose.yml` 追加单文件只读挂载和 `EXTERNAL_PWA_MANIFEST_URL`。已通过本地 compose 渲染、静态资源尺寸、manifest JSON、`loader.js` 语法和 `git diff --check` 校验；测试环境仍需 Portainer Pull and redeploy 后做运行时核验。
+早期单文件 bind mount 路线已被测试环境 Portainer 实测否定：Stack 部署目录里缺失的 `deploy/open-webui/static/*.png` 会被 Docker 自动创建成目录，导致“目录挂载到容器文件路径”的 `not a directory` 错误。当前执行路线已调整为：根层 `docker-compose.yml` 不再挂载静态文件，而是在官方容器启动时用内联 bootstrap 生成 `custom.css`、`loader.js`、manifest 和图标资源；测试环境仍需 Portainer Pull and redeploy 后做运行时核验。
 
 ## 结论
 
-可以在不修改上游源码、不自建镜像、不改官方镜像本体的前提下完成大部分品牌化要求。执行边界是：只在私库根层维护静态资源和 compose bind mount，由 Portainer Git Stack 重新部署后生效。
+可以在不修改上游源码、不自建镜像、不改官方镜像本体的前提下完成大部分品牌化要求。执行边界是：只改私库根层 `docker-compose.yml` 的启动包装逻辑，由容器启动时在自身 filesystem 内生成静态资源，避免依赖 Portainer 宿主机上的 bind mount 文件。
 
 本计划覆盖：
 
@@ -20,19 +20,20 @@
 
 - 不改 `upstream/open-webui/`。
 - 不写 Dockerfile，不构建私有镜像，继续使用 `ghcr.io/open-webui/open-webui:main`。
-- 只改根层部署资产和 `docker-compose.yml`。
-- 静态资源必须进入 Git 仓库；不能依赖 `C:\Users\Windows\Downloads\image.webp` 这种本机临时路径供测试环境部署。
-- 不挂载整个 `/app/backend/open_webui/static` 目录，只挂载需要覆盖的单个文件，避免覆盖上游自带静态资源。
-- 失败回滚应只需要移除 bind mount 或恢复静态资产，不影响 Open WebUI 数据卷。
+- 只改根层部署资产、计划文档和 `docker-compose.yml`。
+- 部署不能依赖 `C:\Users\Windows\Downloads\image.webp` 或 Portainer 宿主机上的相对路径文件；图标源必须随 compose bootstrap 自包含。
+- 不挂载整个 `/app/backend/open_webui/static` 目录，也不挂载单个 static 文件；避免 Portainer 缺失 bind 源时把文件路径创建成目录。
+- 失败回滚应只需要恢复 `docker-compose.yml` 的 `command`，不影响 Open WebUI 数据卷。
 
 ## 当前事实依据
 
 - 上游 `app.html` 已加载 `/static/custom.css` 和 `/static/loader.js`。
 - 测试容器只读核验过 `STATIC_DIR=/app/backend/open_webui/static`，当前 `custom.css` 存在但为空。
-- 上游启动时会清理并重拷贝 `STATIC_DIR`，所以挂载整个 static 目录风险高；单文件 bind mount 更稳。
+- 上游启动时会清理并重拷贝 `STATIC_DIR`，所以 bootstrap 需要启动时先写一次，等待 `/health` 可用后再写一次，覆盖上游初始化后的默认 static。
 - 当前上游 `WEBUI_NAME=Indieark Chat` 会被 `env.py` 改成 `Indieark Chat (Open WebUI)`，不满足“网页名字改成 Indieark Chat”的精确要求。
 - PWA `/manifest.json` 由后端动态生成；本次不使用 `WEBUI_NAME`，改用上游已支持的 `EXTERNAL_PWA_MANIFEST_URL` 指向容器内静态 `/static/manifest.json`。
 - 当前上游静态目录包含这些品牌相关入口：`favicon.png`、`favicon-96x96.png`、`favicon.svg`、`favicon.ico`、`favicon-dark.png`、`apple-touch-icon.png`、`splash.png`、`splash-dark.png`、`logo.png`、`web-app-manifest-192x192.png`、`web-app-manifest-512x512.png`。
+- Portainer Git Stack 在测试环境的实际 compose 运行目录不能保证包含仓库静态文件；缺失 bind 源会被 Docker 创建为目录，因此品牌化资产必须由容器内部生成或由镜像内置。
 - `4-qa-agent` 的可复用视觉边界是“只改皮肤，不改内容 / 布局 / 导航 / 按钮 / 字段 / 功能”；本次 Open WebUI CSS 也沿用这个边界。
 - `4-qa-agent` 色调真源来自 Steam_UI token，并且必须同时覆盖暗色与亮色：
   - 暗色：深蓝黑底 `#0b0f19` / `#171a21` / `#1b2838`，主行动色 `#66c0f4`，辅助文字 `#c7d5e0`，低频绿色 accent `#4c6b22`。
@@ -71,35 +72,23 @@ deploy/
 - `source-image.webp` 复制自 `C:\Users\Windows\Downloads\image.webp`，作为 favicon、PWA 图标、开屏图的单一来源。
 - `brand-indieark-logo-charcoal.svg` 和 `brand-indieark-logo-white.svg` 可复制自 `C:\Vibe_Coding\IndieArk\00000-model\01-复用资产\assets\INDIEARK Text Logo\` 作为备用品牌素材；本次最终执行不把 SVG 挂载进容器，左上品牌位使用 `source-image.webp` 派生的图标 + `Indieark Chat` 文本。
 
-## Compose 挂载
+## Compose 启动生成
 
-在 `docker-compose.yml` 的 `open-webui.volumes` 保留数据卷，并追加单文件只读挂载：
+在 `docker-compose.yml` 的 `open-webui.volumes` 只保留数据卷，不再追加任何 static bind mount：
 
 ```yaml
 services:
   open-webui:
     volumes:
       - open-webui:/app/backend/data
-      - ./deploy/open-webui/static/custom.css:/app/backend/open_webui/static/custom.css:ro
-      - ./deploy/open-webui/static/loader.js:/app/backend/open_webui/static/loader.js:ro
-      - ./deploy/open-webui/static/manifest.json:/app/backend/open_webui/static/manifest.json:ro
-      - ./deploy/open-webui/static/favicon.png:/app/backend/open_webui/static/favicon.png:ro
-      - ./deploy/open-webui/static/favicon-96x96.png:/app/backend/open_webui/static/favicon-96x96.png:ro
-      - ./deploy/open-webui/static/favicon.svg:/app/backend/open_webui/static/favicon.svg:ro
-      - ./deploy/open-webui/static/favicon.ico:/app/backend/open_webui/static/favicon.ico:ro
-      - ./deploy/open-webui/static/favicon-dark.png:/app/backend/open_webui/static/favicon-dark.png:ro
-      - ./deploy/open-webui/static/apple-touch-icon.png:/app/backend/open_webui/static/apple-touch-icon.png:ro
-      - ./deploy/open-webui/static/splash.png:/app/backend/open_webui/static/splash.png:ro
-      - ./deploy/open-webui/static/splash-dark.png:/app/backend/open_webui/static/splash-dark.png:ro
-      - ./deploy/open-webui/static/logo.png:/app/backend/open_webui/static/logo.png:ro
-      - ./deploy/open-webui/static/web-app-manifest-192x192.png:/app/backend/open_webui/static/web-app-manifest-192x192.png:ro
-      - ./deploy/open-webui/static/web-app-manifest-512x512.png:/app/backend/open_webui/static/web-app-manifest-512x512.png:ro
 ```
 
 说明：
 
-- 相对路径适配 Portainer Git Stack 从仓库目录部署。
-- 如果 Portainer 对相对 bind mount 的解析异常，再评估测试机绝对路径，但优先不要引入宿主机外部资产目录。
+- `command` 覆盖官方镜像默认 `bash start.sh`，但最后仍 `exec bash start.sh`，保持官方启动路径。
+- bootstrap 作为后台任务运行，先写入 static 文件，然后等待 `http://127.0.0.1:8080/health`，服务就绪后再写一次，解决上游启动阶段清理 `STATIC_DIR` 的问题。
+- 图标源以 WebP base64 内联到 compose 中，使用官方镜像内已有 Python / Pillow 生成 PNG、ICO 和 SVG wrapper。
+- `EXTERNAL_PWA_MANIFEST_URL` 继续指向容器内 `/static/manifest.json`。
 
 ## 左上品牌位方案
 
@@ -226,16 +215,22 @@ Dither 背景目标：
 5. 编写 `deploy/open-webui/static/manifest.json`，让 PWA 名称、短名称、描述和图标都指向 Indieark Chat 资产。
 6. 编写 `deploy/open-webui/static/custom.css`，只处理全局色调、dither 背景层、左上品牌位和必要尺寸控制；不重写 Open WebUI 组件样式。
 7. 编写 `deploy/open-webui/static/loader.js`，只处理标题和 meta 品牌名替换。
-8. 修改 `docker-compose.yml`，追加上述单文件 `:ro` bind mount，并设置 `EXTERNAL_PWA_MANIFEST_URL=http://127.0.0.1:8080/static/manifest.json`。
+8. 修改 `docker-compose.yml`，移除 static 单文件 bind mount，改为 `command: ["bash", "-lc", "..."]` 在容器内生成上述静态文件，并设置 `EXTERNAL_PWA_MANIFEST_URL=http://127.0.0.1:8080/static/manifest.json`。
 9. 本地校验 compose：
 
    ```bash
    docker compose -f docker-compose.yml config
    ```
 
-10. 提交并推送到 `origin/main`。
-11. 在 Portainer Stack `open-webui` 执行 Pull and redeploy。
-12. 部署后只读核验容器内文件：
+10. 校验内联 Python bootstrap 能被编译：
+
+   ```bash
+   awk "/python - <<'PY'/{flag=1;next} /^        PY$/{flag=0} flag{sub(/^        /, \"\"); print}" docker-compose.yml | python -c "import sys; compile(sys.stdin.read(), 'compose-bootstrap', 'exec')"
+   ```
+
+11. 提交并推送到 `origin/main`。
+12. 在 Portainer Stack `open-webui` 执行 Pull and redeploy。
+13. 部署后只读核验容器内文件：
 
    ```bash
    docker exec open-webui sh -lc 'ls -l /app/backend/open_webui/static/{custom.css,loader.js,favicon.png,splash.png,logo.png}'
@@ -244,13 +239,13 @@ Dither 背景目标：
    curl -I http://127.0.0.1:3000/static/splash.png
    ```
 
-13. 浏览器核验内网 `http://192.168.10.66:3000` 和外网 `https://chat.indieark.tech`。
+14. 浏览器核验内网 `http://192.168.10.66:3000` 和外网 `https://chat.indieark.tech`。
 
 ## 验证标准
 
 - `docker compose config` 通过。
 - 容器仍使用官方镜像 `ghcr.io/open-webui/open-webui:main`。
-- 容器内挂载文件存在，且内容来自仓库 `deploy/open-webui/static/`。
+- 容器内生成文件存在，且 `docker inspect open-webui` 不再出现 `deploy/open-webui/static/*.png` 这类 bind mount。
 - `/static/favicon.png`、`/static/splash.png`、`/static/custom.css`、`/static/loader.js`、`/static/manifest.json` HTTP 返回 200。
 - `/manifest.json` 返回 `name: Indieark Chat`，不再由默认 `Open WebUI` manifest 兜底。
 - 浏览器标签页标题为 `Indieark Chat` 或 `页面标题 • Indieark Chat`，不出现 `Open WebUI` 或 `Indieark Chat (Open WebUI)`。
@@ -271,7 +266,7 @@ Dither 背景目标：
 
 完整回滚：
 
-1. 移除 `docker-compose.yml` 中新增的静态文件 bind mount。
+1. 恢复 `docker-compose.yml` 中的 `command` 为官方默认 `bash start.sh`，或直接移除 `command`。
 2. 推送后 Portainer redeploy。
 
 ## 风险与注意事项
@@ -281,4 +276,4 @@ Dither 背景目标：
 - `loader.js` 当前上游为空；如果未来上游开始使用该文件，升级时需要对比并合并上游内容，避免覆盖新逻辑。
 - favicon 存在浏览器缓存，需要用无痕窗口或清缓存验证。
 - Cloudflare Access 不影响同域静态资源加载；只要主页面通过 Access，`/static/*` 应同域可访问。
-- Portainer Git Stack 的 bind mount 相对路径必须部署后核验，不能只凭本地 compose 通过判定成功。
+- 由于 `command` 内联内容较长，每次改 CSS / JS / 图标都必须同时跑 compose config 和内联 Python compile 校验。
