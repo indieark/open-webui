@@ -1,7 +1,7 @@
 {
-  "name": "Indieark Chat",
-  "short_name": "Indieark Chat",
-  "description": "Indieark Chat",
+  "name": "IndieArk Chat",
+  "short_name": "IndieArk Chat",
+  "description": "IndieArk Chat",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

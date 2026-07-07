@@ -2,7 +2,7 @@
 
 ## 执行状态
 
-早期单文件 bind mount 路线已被测试环境 Portainer 实测否定：Stack 部署目录里缺失的 `deploy/open-webui/static/*.png` 会被 Docker 自动创建成目录，导致“目录挂载到容器文件路径”的 `not a directory` 错误。当前执行路线已调整为：根层 `docker-compose.yml` 不再挂载静态文件，而是在官方容器启动时用内联 bootstrap 生成 `custom.css`、`loader.js`、manifest 和图标资源；测试环境仍需 Portainer Pull and redeploy 后做运行时核验。
+早期单文件 bind mount 路线已被测试环境 Portainer 实测否定：Stack 部署目录里缺失的 `deploy/open-webui/static/*.png` 会被 Docker 自动创建成目录，导致“目录挂载到容器文件路径”的 `not a directory` 错误。当前执行路线已调整为：根层 `docker-compose.yml` 不再挂载静态文件，而是在官方容器启动时用内联 bootstrap 生成 `custom.css`、`loader.js`、manifest 和图标资源；本地部署层实现和静态校验已完成，测试环境仍需 Portainer Pull and redeploy 后做运行时核验。
 
 ## 结论
 
@@ -10,11 +10,11 @@
 
 本计划覆盖：
 
-- 左上品牌位显示应用图标 + `Indieark Chat`；桌面端优先复用 Open WebUI 侧边栏顶部原生结构，移动端聊天栏提供同样结构的 CSS 兜底。
+- 左上品牌位显示应用图标 + `IndieArk Chat`；桌面端优先复用 Open WebUI 侧边栏顶部原生结构，移动端聊天栏提供同样结构的 CSS 兜底。
 - 浏览器 favicon、PWA 图标、登录/侧边栏默认图标使用 `C:\Users\Windows\Downloads\image.webp` 派生资源。
 - 开屏图标 `splash.png` / `splash-dark.png` 使用同一张 `image.webp` 派生资源。
-- 网页标题显示为 `Indieark Chat`，不使用会追加 ` (Open WebUI)` 的 `WEBUI_NAME` 环境变量路线。
-- CSS 仅调整全局色调和 dither 背景层，不重写页面内容和组件样式。
+- 网页标题显示为 `IndieArk Chat`，不使用会追加 ` (Open WebUI)` 的 `WEBUI_NAME` 环境变量路线。
+- CSS 作为部署层皮肤覆盖：保留页面内容、组件结构和上游源码不变，但按用户截图反馈收口暗色 surface、侧栏按钮、输入区按钮、下拉菜单、悬浮工具条、右侧控制抽屉、滚动条和开关色调。
 
 ## 不变量
 
@@ -30,7 +30,7 @@
 - 上游 `app.html` 已加载 `/static/custom.css` 和 `/static/loader.js`。
 - 测试容器只读核验过 `STATIC_DIR=/app/backend/open_webui/static`，当前 `custom.css` 存在但为空。
 - 上游启动时会清理并重拷贝 `STATIC_DIR`，所以 bootstrap 需要启动时先写一次，等待 `/health` 可用后再写一次，覆盖上游初始化后的默认 static。
-- 当前上游 `WEBUI_NAME=Indieark Chat` 会被 `env.py` 改成 `Indieark Chat (Open WebUI)`，不满足“网页名字改成 Indieark Chat”的精确要求。
+- 当前上游 `WEBUI_NAME=IndieArk Chat` 会被 `env.py` 改成 `IndieArk Chat (Open WebUI)`，不满足“网页名字改成 IndieArk Chat”的精确要求。
 - PWA `/manifest.json` 由后端动态生成；本次不使用 `WEBUI_NAME`，改用上游已支持的 `EXTERNAL_PWA_MANIFEST_URL` 指向容器内静态 `/static/manifest.json`。
 - 当前上游静态目录包含这些品牌相关入口：`favicon.png`、`favicon-96x96.png`、`favicon.svg`、`favicon.ico`、`favicon-dark.png`、`apple-touch-icon.png`、`splash.png`、`splash-dark.png`、`logo.png`、`web-app-manifest-192x192.png`、`web-app-manifest-512x512.png`。
 - Portainer Git Stack 在测试环境的实际 compose 运行目录不能保证包含仓库静态文件；缺失 bind 源会被 Docker 创建为目录，因此品牌化资产必须由容器内部生成或由镜像内置。
@@ -70,7 +70,7 @@ deploy/
 来源规则：
 
 - `source-image.webp` 复制自 `C:\Users\Windows\Downloads\image.webp`，作为 favicon、PWA 图标、开屏图的单一来源。
-- `brand-indieark-logo-charcoal.svg` 和 `brand-indieark-logo-white.svg` 可复制自 `C:\Vibe_Coding\IndieArk\00000-model\01-复用资产\assets\INDIEARK Text Logo\` 作为备用品牌素材；本次最终执行不把 SVG 挂载进容器，左上品牌位使用 `source-image.webp` 派生的图标 + `Indieark Chat` 文本。
+- `brand-indieark-logo-charcoal.svg` 和 `brand-indieark-logo-white.svg` 可复制自 `C:\Vibe_Coding\IndieArk\00000-model\01-复用资产\assets\INDIEARK Text Logo\` 作为备用品牌素材；本次最终执行不把 SVG 挂载进容器，左上品牌位使用 `source-image.webp` 派生的图标 + `IndieArk Chat` 文本。
 
 ## Compose 启动生成
 
@@ -97,30 +97,28 @@ services:
 策略：
 
 - 左侧图标使用 `source-image.webp` 派生的 `favicon.png`，保持和 favicon / PWA / splash 同源。
-- `loader.js` 把运行时品牌文本从 `Open WebUI` 替换为 `Indieark Chat`，避免使用会追加 ` (Open WebUI)` 的 `WEBUI_NAME` 环境变量。
+- `loader.js` 把运行时品牌文本从 `Open WebUI` 替换为 `IndieArk Chat`，避免使用会追加 ` (Open WebUI)` 的 `WEBUI_NAME` 环境变量。
 - `custom.css` 只对侧边栏品牌图标做尺寸、圆角和轻微 glow 处理，符合截图中的“图标 + 名称”结构。
-- 移动端聊天栏在侧边栏不可见时，用 CSS `::before` / `::after` 兜底显示小图标 + `Indieark Chat`；窄屏降级为 `Chat`，避免挤压模型选择器和右侧按钮。
+- 移动端聊天栏在侧边栏不可见时，用 CSS `::before` / `::after` 兜底显示小图标 + `IndieArk Chat`；窄屏降级为 `Chat`，避免挤压模型选择器和右侧按钮。
 - 如果后续上游 DOM 结构变动导致选择器失效，只更新 `custom.css` / `loader.js`，不碰上游源码。
 
 执行前需要用浏览器或 DOM 截图确认选择器命中当前品牌位，避免影响设置页导航或模型选择器。
 
 ## CSS 色调与 Dither 边界
 
-用户本轮明确收窄 CSS 范围：只改色调，加 dither 背景。不要借此重写 Open WebUI 的页面内容、组件结构或组件样式。
+本计划的 CSS 边界经历过一次收敛和一次扩展：
 
-允许改：
+- 初始边界：只改色调，加 dither 背景，不重写 Open WebUI 的页面内容、组件结构或上游源码。
+- 用户后续截图确认：暗色态仍有大量默认灰色，需要继续覆盖右侧“对话高级设置”抽屉、侧栏按钮、输入区按钮、工具/上传下拉菜单、富文本浮动工具条、选中文本悬浮栏、底部悬浮圆形按钮、滚动条和开关色调。
 
-- `html` / `body` / 顶层 app 容器的背景色、背景图层和基础颜色变量。
-- 全局品牌 token，例如 `--indieark-bg-base`、`--indieark-bg-deep`、`--indieark-primary`、`--indieark-text-secondary`。
-- 页面最外层 dither 背景层，例如 `body::before` 或等价 fixed pseudo layer。
-- 只为让 dither 可见而调整最外层 route/shell 背景的透明度；调整必须限定在外层背景，不碰消息气泡、输入框、按钮、卡片、模型选择器、菜单、弹窗等具体组件。
+最终执行边界：
 
-禁止改：
-
-- 不改消息气泡圆角、边框、阴影、padding、字体大小和布局。
-- 不改输入框、发送按钮、模型选择器、侧边栏条目、菜单、modal 的组件样式。
-- 不把 Open WebUI 改成 4-qa-agent 的完整 Steam_UI 组件库。
-- 不引入 React/Three/WebGL 运行时代码来复刻 `AgentDitherBackground.tsx`。
+- 不改 `upstream/open-webui/`，不改 Svelte 组件源码，不构建私有镜像。
+- 不改页面内容、导航结构、字段、交互功能、数据流和组件 DOM 结构。
+- 允许通过 `deploy/open-webui/static/custom.css` 覆盖颜色、surface、border、hover/selected、shadow、scrollbar、switch 和品牌 token。
+- 允许通过 `loader.js` 替换运行时品牌文本、标题、meta 和 `oled-dark` 辅助 class。
+- 允许通过 `docker-compose.yml` command bootstrap 把上述静态资源写入官方容器内部 static 目录。
+- 不把 Open WebUI 改成 4-qa-agent 的完整 Steam_UI 组件库，只迁移 4-qa-agent 的色调、明暗主题思路和 dither 背景语言。
 
 色调目标分为暗色和亮色两套，不只做暗色：
 
@@ -159,37 +157,38 @@ Dither 背景目标：
 - 支持 `prefers-reduced-motion: reduce`：如果后续加入轻动画，降级为静态背景。
 - `oled-dark` 归入暗色策略，但背景底色可以更深，避免和 Open WebUI OLED 黑冲突。
 
-执行时 `custom.css` 的 CSS 变更应按这个顺序组织：
+执行时 `custom.css` 的 CSS 变更按这个顺序组织：
 
 1. IndieArk token：默认暗色，`html.light` 覆盖亮色，`html.oled-dark` 覆盖极暗底色。
-2. 最外层背景色：只处理 `html` / `body` / route shell，不处理具体组件。
+2. 最外层背景色和 dither 背景：处理 `html` / `body` / route shell。
 3. dither pseudo layer：暗色和亮色分开规则。
-4. 左上品牌位标识。
-5. 必要的主题降级和 reduced-motion 规则。
+4. 暗色 surface 系统：Tailwind gray token、modal/dropdown/card/input、右侧控制抽屉、输入区、侧栏、悬浮栏、滚动条、开关。
+5. 左上品牌位标识。
+6. 必要的主题降级和 reduced-motion 规则。
 
-验收时如果发现 dither 被上游 `bg-white` / `dark:bg-gray-*` 外层盖住，只允许最小化处理外层 shell 背景；不能为了露出 dither 去改具体组件表面。
+验收时如果发现新的默认灰色面，应优先确认是否属于上游 `dark:bg-gray-*` / `dark:hover:bg-gray-*` / `role="menu"` / `role="switch"` 这类可由部署层 CSS 覆盖的 surface。只有在不改源码、不改 DOM、不影响功能的前提下，才继续补 `custom.css` 选择器。
 
 分析完整性补充：
 
-- 当前计划已覆盖部署入口、资源挂载、标题修正、左上品牌位、全局色调和 dither 背景。
+- 当前计划已覆盖部署入口、资源生成、标题修正、左上品牌位、全局色调、dither 背景和暗色 surface 收口。
 - 当前计划必须保留两个主题验收路径：暗色/`oled-dark` 与亮色都要分别看，不允许只在暗色截图通过就判定完成。
 - 当前计划仍不覆盖完整 Steam_UI 组件迁移，因为用户明确要求页面内容和组件样式不变。
 
 ## 网页标题方案
 
-不使用 `WEBUI_NAME=Indieark Chat`，因为当前上游会追加 ` (Open WebUI)`。
+不使用 `WEBUI_NAME=IndieArk Chat`，因为当前上游会追加 ` (Open WebUI)`。
 
 推荐通过挂载 `/static/loader.js` 实现最小标题修正：
 
 - `loader.js` 由上游 `app.html` 原生加载，当前文件为空，适合作为部署层轻量品牌脚本入口。
-- 脚本只做三件事：把初始标题 `Open WebUI` 改成 `Indieark Chat`；把路由标题里的 `Open WebUI` 后缀替换成 `Indieark Chat`；同步 `apple-mobile-web-app-title` / `description` 等 meta。
+- 脚本只做三件事：把初始标题 `Open WebUI` 改成 `IndieArk Chat`；把路由标题里的 `Open WebUI` 后缀替换成 `IndieArk Chat`；同步 `apple-mobile-web-app-title` / `description` 等 meta。
 - 使用 `MutationObserver` 监听 `<title>` 被 Svelte 后续更新的情况，只替换品牌后缀，不破坏聊天标题前缀。
 
 示例目标效果：
 
-- 首页：`Indieark Chat`
-- 工作区：`Workspace • Indieark Chat`
-- 单个对话页：`对话标题 • Indieark Chat`
+- 首页：`IndieArk Chat`
+- 工作区：`Workspace • IndieArk Chat`
+- 单个对话页：`对话标题 • IndieArk Chat`
 
 ## 图标与开屏资源生成
 
@@ -212,7 +211,7 @@ Dither 背景目标：
 2. 复制 `C:\Users\Windows\Downloads\image.webp` 到 `deploy/open-webui/static/source-image.webp`。
 3. 可选复制 `00000-model` 的 IndieArk 文字 logo SVG 到 `deploy/open-webui/static/` 作为备用素材；本次执行不挂载、不用于顶栏。
 4. 使用 Pillow 从 `source-image.webp` 生成 favicon、PWA 图标和 splash 资源。
-5. 编写 `deploy/open-webui/static/manifest.json`，让 PWA 名称、短名称、描述和图标都指向 Indieark Chat 资产。
+5. 编写 `deploy/open-webui/static/manifest.json`，让 PWA 名称、短名称、描述和图标都指向 IndieArk Chat 资产。
 6. 编写 `deploy/open-webui/static/custom.css`，只处理全局色调、dither 背景层、左上品牌位和必要尺寸控制；不重写 Open WebUI 组件样式。
 7. 编写 `deploy/open-webui/static/loader.js`，只处理标题和 meta 品牌名替换。
 8. 修改 `docker-compose.yml`，移除 static 单文件 bind mount，改为 `command: ["bash", "-lc", "..."]` 在容器内生成上述静态文件，并设置 `EXTERNAL_PWA_MANIFEST_URL=http://127.0.0.1:8080/static/manifest.json`。
@@ -247,13 +246,13 @@ Dither 背景目标：
 - 容器仍使用官方镜像 `ghcr.io/open-webui/open-webui:main`。
 - 容器内生成文件存在，且 `docker inspect open-webui` 不再出现 `deploy/open-webui/static/*.png` 这类 bind mount。
 - `/static/favicon.png`、`/static/splash.png`、`/static/custom.css`、`/static/loader.js`、`/static/manifest.json` HTTP 返回 200。
-- `/manifest.json` 返回 `name: Indieark Chat`，不再由默认 `Open WebUI` manifest 兜底。
-- 浏览器标签页标题为 `Indieark Chat` 或 `页面标题 • Indieark Chat`，不出现 `Open WebUI` 或 `Indieark Chat (Open WebUI)`。
+- `/manifest.json` 返回 `name: IndieArk Chat`，不再由默认 `Open WebUI` manifest 兜底。
+- 浏览器标签页标题为 `IndieArk Chat` 或 `页面标题 • IndieArk Chat`，不出现 `Open WebUI` 或 `IndieArk Chat (Open WebUI)`。
 - 开屏图、登录页默认图标、侧边栏默认图标不再显示上游默认图标。
-- 左上品牌位显示应用图标 + `Indieark Chat`，移动端聊天栏兜底不遮挡模型选择器和右侧按钮。
+- 左上品牌位显示应用图标 + `IndieArk Chat`，移动端聊天栏兜底不遮挡模型选择器和右侧按钮。
 - 暗色/`oled-dark` 页面整体色调接近 `4-qa-agent` 的深蓝黑 + Steam 蓝高光；亮色页面整体色调接近 `4-qa-agent` 的亮白玻璃 + Steam 青蓝弱高光。
 - 暗色和亮色都存在 dither 背景，但亮色必须明显更弱，不影响文字可读性、点击和滚动。
-- 消息、输入框、按钮、菜单、模型选择器等组件样式保持 Open WebUI 原状。
+- 消息内容、输入流程、按钮功能、菜单结构、模型选择器结构保持 Open WebUI 原状；暗色 surface、hover/selected、滚动条、开关和品牌色可由 `custom.css` 收口为 IndieArk 色调。
 - 容器 healthy，`3000` 端口正常。
 
 ## 回滚

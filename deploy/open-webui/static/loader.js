@@ -1,5 +1,5 @@
 (() => {
-	const BRAND_NAME = 'Indieark Chat';
+	const BRAND_NAME = 'IndieArk Chat';
 	const OPEN_WEBUI = 'Open WebUI';
 	let isPatching = false;
 	let patchQueued = false;
@@ -10,7 +10,7 @@
 		}
 
 		return value
-			.replace(/Indieark Chat\s*\(Open WebUI\)/g, BRAND_NAME)
+			.replace(/IndieArk Chat\s*\(Open WebUI\)/g, BRAND_NAME)
 			.replace(/Open WebUI/g, BRAND_NAME);
 	};
 

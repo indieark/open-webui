@@ -17,6 +17,7 @@
 | 主题 | 文件 |
 | --- | --- |
 | 当前部署事实 | [deployment.md](deployment.md) |
+| 品牌与部署层自定义 UI | [../plans/2026-07-07-open-webui-branding-compose-mount-plan.md](../plans/2026-07-07-open-webui-branding-compose-mount-plan.md) |
 | 上游同步 | [../UPSTREAMS.md](../UPSTREAMS.md) |
 | 兼容层边界 | [compatibility-layer.md](compatibility-layer.md) |
 | 本地 AI 规则骨架 | [../.agent/README.md](../.agent/README.md) |

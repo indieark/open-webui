@@ -34,9 +34,19 @@
 - Ollama: `OLLAMA_BASE_URL=http://host.docker.internal:11434`
 - stream buffer env: `CHAT_STREAM_RESPONSE_CHUNK_MAX_BUFFER_SIZE=${CHAT_STREAM_RESPONSE_CHUNK_MAX_BUFFER_SIZE:-10485760}`
 - aiohttp read buffer env: `AIOHTTP_READ_BUFSIZE=${AIOHTTP_READ_BUFSIZE:-1048576}`
+- external PWA manifest: `EXTERNAL_PWA_MANIFEST_URL=http://127.0.0.1:8080/static/manifest.json`
 - telemetry disabled: `SCARF_NO_ANALYTICS=true`, `DO_NOT_TRACK=true`, `ANONYMIZED_TELEMETRY=false`
 
 Portainer stack 的 Environment variables 只会用于 compose `${VAR}` 替换。变量必须出现在 `docker-compose.yml` 的 service `environment:` 下，才会进入容器运行时环境。`CHAT_STREAM_RESPONSE_CHUNK_MAX_BUFFER_SIZE` 和 `AIOHTTP_READ_BUFSIZE` 已在根层 compose 显式传入，默认值分别为 `10485760` 和 `1048576`。
+
+当前 `docker-compose.yml` 还包含 IndieArk 品牌资源启动 bootstrap：服务启动时在官方容器内部生成 `/app/backend/open_webui/static/custom.css`、`loader.js`、manifest、favicon、PWA 图标和 splash 图。该路径不依赖 Portainer 宿主机 bind mount，也不修改 `upstream/open-webui/` 或构建私有镜像。维护入口是 [../deploy/open-webui/static/](../deploy/open-webui/static/) 和 [../plans/2026-07-07-open-webui-branding-compose-mount-plan.md](../plans/2026-07-07-open-webui-branding-compose-mount-plan.md)。
+
+更新 `deploy/open-webui/static/custom.css`、`loader.js` 或 `manifest.json` 后，必须同步更新 `docker-compose.yml` 内联常量并运行：
+
+```bash
+WEBUI_SECRET_KEY=verify-placeholder docker compose -f docker-compose.yml config
+awk "/python - <<'PY'/{flag=1;next} /^        PY$/{flag=0} flag{sub(/^        /, \"\"); print}" docker-compose.yml | python -c "import sys; compile(sys.stdin.read(), 'compose-bootstrap', 'exec')"
+```
 
 配置验证：
 

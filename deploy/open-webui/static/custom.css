@@ -1,15 +1,28 @@
-/* IndieArk deployment skin: color tone, dither backdrop, and brand chrome only. */
+/* IndieArk deployment skin: color tone, surface system, dither backdrop, and brand chrome. */
 :root {
 	--indieark-bg-base: #0b0f19;
 	--indieark-bg-deep: #171a21;
 	--indieark-bg-nav: rgba(15, 23, 42, 0.72);
 	--indieark-bg-shell: rgba(11, 15, 25, 0.7);
 	--indieark-bg-shell-mid: rgba(11, 15, 25, 0.42);
+	--indieark-surface-page: #07101b;
+	--indieark-surface-0: #09111d;
+	--indieark-surface-1: #0b1624;
+	--indieark-surface-2: #102033;
+	--indieark-surface-3: #152842;
+	--indieark-surface-popover: #0d1827;
+	--indieark-surface-hover: rgba(102, 192, 244, 0.11);
+	--indieark-surface-selected: rgba(102, 192, 244, 0.16);
 	--indieark-primary: #66c0f4;
+	--indieark-primary-contrast: #03101c;
 	--indieark-primary-glow: rgba(102, 192, 244, 0.28);
 	--indieark-text-primary: #f2f7fb;
 	--indieark-text-secondary: #c7d5e0;
 	--indieark-border-soft: rgba(102, 192, 244, 0.14);
+	--indieark-border-strong: rgba(102, 192, 244, 0.22);
+	--indieark-scrollbar-track: rgba(5, 11, 20, 0.84);
+	--indieark-scrollbar-thumb: rgba(102, 192, 244, 0.38);
+	--indieark-scrollbar-thumb-hover: rgba(102, 192, 244, 0.56);
 	--indieark-dither-opacity: 0.82;
 	--indieark-dither-blend: normal;
 }
@@ -20,21 +33,62 @@ html.light {
 	--indieark-bg-nav: rgba(255, 255, 255, 0.82);
 	--indieark-bg-shell: rgba(248, 249, 250, 0.76);
 	--indieark-bg-shell-mid: rgba(248, 249, 250, 0.46);
+	--indieark-surface-page: #f8f9fa;
+	--indieark-surface-0: #ffffff;
+	--indieark-surface-1: #f5f8fb;
+	--indieark-surface-2: #edf4fb;
+	--indieark-surface-3: #e5eff8;
+	--indieark-surface-popover: #ffffff;
+	--indieark-surface-hover: rgba(79, 172, 254, 0.1);
+	--indieark-surface-selected: rgba(79, 172, 254, 0.14);
 	--indieark-primary: #4facfe;
+	--indieark-primary-contrast: #041527;
 	--indieark-primary-glow: rgba(79, 172, 254, 0.16);
 	--indieark-text-primary: #2a2925;
 	--indieark-text-secondary: #5f5c55;
 	--indieark-border-soft: rgba(79, 172, 254, 0.16);
+	--indieark-border-strong: rgba(79, 172, 254, 0.24);
+	--indieark-scrollbar-track: rgba(237, 244, 251, 0.86);
+	--indieark-scrollbar-thumb: rgba(79, 172, 254, 0.38);
+	--indieark-scrollbar-thumb-hover: rgba(79, 172, 254, 0.56);
 	--indieark-dither-opacity: 0.46;
 	--indieark-dither-blend: multiply;
 }
 
-html.indieark-oled-dark {
-	--indieark-bg-base: #000000;
-	--indieark-bg-deep: #070a10;
-	--indieark-bg-nav: rgba(4, 8, 14, 0.76);
-	--indieark-bg-shell: rgba(0, 0, 0, 0.68);
-	--indieark-bg-shell-mid: rgba(0, 0, 0, 0.42);
+html.dark:not(.her) {
+	color-scheme: dark;
+	scrollbar-color: var(--indieark-scrollbar-thumb) var(--indieark-scrollbar-track);
+	scrollbar-width: thin;
+	--color-gray-50: #f2f7fb !important;
+	--color-gray-100: #dce9f5 !important;
+	--color-gray-200: #c7d5e0 !important;
+	--color-gray-300: #aebfd1 !important;
+	--color-gray-400: #93a8bd !important;
+	--color-gray-500: #748aa3 !important;
+	--color-gray-600: #50657e !important;
+	--color-gray-700: #20344c !important;
+	--color-gray-800: #152842 !important;
+	--color-gray-850: #102033 !important;
+	--color-gray-900: #0b1624 !important;
+	--color-gray-950: #07101b !important;
+}
+
+html.dark.indieark-oled-dark:not(.her) {
+	--indieark-bg-base: #02060d;
+	--indieark-bg-deep: #050a12;
+	--indieark-bg-nav: rgba(3, 8, 14, 0.8);
+	--indieark-bg-shell: rgba(2, 6, 13, 0.72);
+	--indieark-bg-shell-mid: rgba(2, 6, 13, 0.46);
+	--indieark-surface-page: #02060d;
+	--indieark-surface-0: #050b14;
+	--indieark-surface-1: #07101b;
+	--indieark-surface-2: #0b1828;
+	--indieark-surface-3: #102033;
+	--indieark-surface-popover: #07101b;
+	--color-gray-800: #102033 !important;
+	--color-gray-850: #0b1828 !important;
+	--color-gray-900: #07101b !important;
+	--color-gray-950: #02060d !important;
 }
 
 html,
@@ -90,6 +144,360 @@ html.light body::after {
 	opacity: 0.035;
 }
 
+html.dark:not(.her),
+html.dark:not(.her) body {
+	background-color: var(--indieark-bg-base) !important;
+}
+
+html.dark:not(.her) *,
+html.dark:not(.her) *::before,
+html.dark:not(.her) *::after {
+	scrollbar-color: var(--indieark-scrollbar-thumb) var(--indieark-scrollbar-track);
+}
+
+html.dark:not(.her) *::-webkit-scrollbar {
+	width: 10px;
+	height: 10px;
+}
+
+html.dark:not(.her) *::-webkit-scrollbar-track {
+	background: var(--indieark-scrollbar-track);
+	border-radius: 999px;
+}
+
+html.dark:not(.her) *::-webkit-scrollbar-thumb {
+	background:
+		linear-gradient(180deg, var(--indieark-scrollbar-thumb-hover), var(--indieark-scrollbar-thumb))
+		border-box;
+	border: 2px solid transparent;
+	border-radius: 999px;
+	background-clip: padding-box;
+	box-shadow: inset 0 0 0 1px rgba(102, 192, 244, 0.22);
+}
+
+html.dark:not(.her) *::-webkit-scrollbar-thumb:hover {
+	background:
+		linear-gradient(180deg, rgba(126, 209, 255, 0.72), var(--indieark-scrollbar-thumb-hover))
+		border-box;
+	background-clip: padding-box;
+}
+
+html.dark:not(.her) [class*="dark:bg-black"],
+html.dark:not(.her) [class*="dark:bg-gray-950"],
+html.dark:not(.her) [class*="dark:bg-gray-900"] {
+	background-color: var(--indieark-surface-0) !important;
+}
+
+html.dark:not(.her) [class*="dark:bg-black/"],
+html.dark:not(.her) [class*="dark:bg-gray-950/"],
+html.dark:not(.her) [class*="dark:bg-gray-900/"] {
+	background-color: rgba(7, 16, 27, 0.72) !important;
+}
+
+html.dark:not(.her) [class*="dark:bg-gray-850"] {
+	background-color: var(--indieark-surface-2) !important;
+}
+
+html.dark:not(.her) [class*="dark:bg-gray-850/"] {
+	background-color: rgba(16, 32, 51, 0.72) !important;
+}
+
+html.dark:not(.her) [class*="dark:!bg-gray-850"] {
+	background-color: var(--indieark-surface-2) !important;
+}
+
+html.dark:not(.her) [class*="dark:bg-gray-800"] {
+	background-color: var(--indieark-surface-3) !important;
+}
+
+html.dark:not(.her) [class*="dark:bg-gray-800/"] {
+	background-color: rgba(21, 40, 66, 0.72) !important;
+}
+
+html.dark:not(.her) [class*="dark:bg-gray-700"] {
+	background-color: #20344c !important;
+}
+
+html.dark:not(.her) [class*="dark:bg-gray-700/"] {
+	background-color: rgba(32, 52, 76, 0.62) !important;
+}
+
+html.dark:not(.her) [class*="dark:bg-white/5"],
+html.dark:not(.her) [class*="dark:bg-white/10"],
+html.dark:not(.her) [class*="dark:bg-white/20"],
+html.dark:not(.her) [class*="dark:bg-white/30"],
+html.dark:not(.her) [class*="dark:bg-gray-100/5"],
+html.dark:not(.her) [class*="dark:bg-gray-100/10"],
+html.dark:not(.her) [class*="dark:bg-gray-500/5"],
+html.dark:not(.her) [class*="dark:bg-gray-400/10"],
+html.dark:not(.her) [class*="dark:bg-gray-200/50"] {
+	background-color: var(--indieark-surface-hover) !important;
+}
+
+html.dark:not(.her) [class*="dark:hover:bg-gray-900"]:hover,
+html.dark:not(.her) [class*="dark:hover:bg-gray-850"]:hover,
+html.dark:not(.her) [class*="dark:hover:bg-gray-800"]:hover,
+html.dark:not(.her) [class*="dark:hover:bg-gray-700"]:hover,
+html.dark:not(.her) [class*="dark:hover:bg-white/5"]:hover,
+html.dark:not(.her) [class*="dark:hover:bg-white/10"]:hover,
+html.dark:not(.her) [class*="dark:hover:bg-gray-600/10"]:hover,
+html.dark:not(.her) [class*="dark:hover:bg-gray-500/10"]:hover {
+	background-color: var(--indieark-surface-hover) !important;
+}
+
+html.dark:not(.her) [class*="dark:border-gray-850"],
+html.dark:not(.her) [class*="dark:border-gray-800"],
+html.dark:not(.her) [class*="dark:border-gray-700"] {
+	border-color: var(--indieark-border-soft) !important;
+}
+
+html.dark:not(.her) [role="menu"],
+html.dark:not(.her) .modal > div,
+html.dark:not(.her) [class*="rounded-3xl"][class*="dark:bg-gray-900"],
+html.dark:not(.her) [class*="rounded-4xl"][class*="dark:bg-gray-900"] {
+	background:
+		linear-gradient(180deg, rgba(13, 24, 39, 0.96), rgba(7, 16, 27, 0.98)) !important;
+	border-color: var(--indieark-border-soft) !important;
+	box-shadow:
+		0 24px 80px rgba(0, 0, 0, 0.38),
+		0 0 0 1px rgba(102, 192, 244, 0.08) !important;
+}
+
+html.dark:not(.her) .modal[aria-modal="true"] {
+	background-color: rgba(2, 6, 13, 0.72) !important;
+	backdrop-filter: blur(12px);
+}
+
+html.dark:not(.her) input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+html.dark:not(.her) textarea,
+html.dark:not(.her) select {
+	background-color: rgba(7, 16, 27, 0.68) !important;
+	border-color: var(--indieark-border-soft) !important;
+	color: var(--indieark-text-primary) !important;
+	caret-color: var(--indieark-primary);
+}
+
+html.dark:not(.her) input::placeholder,
+html.dark:not(.her) textarea::placeholder {
+	color: rgba(199, 213, 224, 0.55) !important;
+}
+
+html.dark:not(.her) :focus-visible {
+	outline-color: var(--indieark-primary) !important;
+}
+
+html.dark:not(.her) input[type="range"] {
+	accent-color: var(--indieark-primary);
+	background-color: rgba(32, 52, 76, 0.72) !important;
+}
+
+html.dark:not(.her) input[type="checkbox"],
+html.dark:not(.her) input[type="radio"] {
+	accent-color: var(--indieark-primary);
+	border-color: var(--indieark-border-strong) !important;
+}
+
+html.dark:not(.her) :is(button, a)[class*="dark:bg-white"][class*="dark:text-black"] {
+	background:
+		linear-gradient(180deg, #7bd0ff, var(--indieark-primary)) !important;
+	color: var(--indieark-primary-contrast) !important;
+	box-shadow: 0 0 0 1px rgba(102, 192, 244, 0.42), 0 10px 30px rgba(102, 192, 244, 0.22);
+}
+
+html.dark:not(.her)
+	:is(button, a)[class*="dark:bg-white"][class*="dark:text-black"]:hover {
+	background:
+		linear-gradient(180deg, #9addff, #74caff) !important;
+}
+
+html.dark:not(.her) button:disabled,
+html.dark:not(.her) button.disabled,
+html.dark:not(.her) #send-message-button:disabled {
+	background-color: rgba(32, 52, 76, 0.62) !important;
+	color: rgba(199, 213, 224, 0.55) !important;
+	box-shadow: none !important;
+}
+
+html.dark:not(.her) #message-input-container {
+	background:
+		linear-gradient(180deg, rgba(13, 24, 39, 0.72), rgba(7, 16, 27, 0.82)) !important;
+	border-color: var(--indieark-border-soft) !important;
+	box-shadow:
+		0 16px 48px rgba(0, 0, 0, 0.32),
+		0 0 0 1px rgba(102, 192, 244, 0.05) !important;
+}
+
+html.dark:not(.her) #message-input-container:hover,
+html.dark:not(.her) #message-input-container:focus-within {
+	border-color: var(--indieark-border-strong) !important;
+	box-shadow:
+		0 18px 56px rgba(0, 0, 0, 0.34),
+		0 0 0 1px rgba(102, 192, 244, 0.12) !important;
+}
+
+html.dark:not(.her) #input-menu-button,
+html.dark:not(.her) #integration-menu-button,
+html.dark:not(.her) #model-valves-button,
+html.dark:not(.her) #voice-input-button,
+html.dark:not(.her) #create-note-button,
+html.dark:not(.her) #message-input-container button[class*="rounded-full"][class*="dark:hover:bg-gray"],
+html.dark:not(.her) button[class*="dark:bg-white/20"][class*="rounded-full"] {
+	background-color: transparent !important;
+	color: var(--indieark-text-secondary) !important;
+}
+
+html.dark:not(.her) #input-menu-button:hover,
+html.dark:not(.her) #integration-menu-button:hover,
+html.dark:not(.her) #model-valves-button:hover,
+html.dark:not(.her) #voice-input-button:hover,
+html.dark:not(.her) #create-note-button:hover,
+html.dark:not(.her) #message-input-container button[class*="rounded-full"][class*="dark:hover:bg-gray"]:hover,
+html.dark:not(.her) button[class*="dark:bg-white/20"][class*="rounded-full"]:hover {
+	background-color: var(--indieark-surface-hover) !important;
+	color: var(--indieark-text-primary) !important;
+}
+
+html.dark:not(.her) #controls-container,
+html.dark:not(.her) #controls-container > div,
+html.dark:not(.her) [class*="min-h-[100dvh]"][class*="dark:!bg-gray-850"],
+html.dark:not(.her) [class*="z-10"][class*="dark:bg-gray-850"]:has(#controls-container) {
+	background:
+		linear-gradient(180deg, rgba(13, 24, 39, 0.98), rgba(7, 16, 27, 0.99)) !important;
+	border-color: var(--indieark-border-soft) !important;
+}
+
+html.dark:not(.her) #controls-container {
+	box-shadow:
+		inset 1px 0 0 rgba(102, 192, 244, 0.1),
+		-24px 0 80px rgba(0, 0, 0, 0.28) !important;
+}
+
+html.dark:not(.her) #controls-resizer {
+	border-color: var(--indieark-border-soft) !important;
+}
+
+html.dark:not(.her) #controls-container [class*="dark:bg-gray-800"],
+html.dark:not(.her) #controls-container [class*="dark:bg-gray-850"],
+html.dark:not(.her) #controls-container [class*="dark:bg-gray-900"] {
+	background-color: rgba(16, 32, 51, 0.82) !important;
+}
+
+html.dark:not(.her) #controls-container button[class*="dark:bg-gray-800"],
+html.dark:not(.her) #controls-container button[class*="dark:hover:bg-gray-800"]:hover {
+	background-color: var(--indieark-surface-hover) !important;
+}
+
+html.dark:not(.her) #bubble-menu > div,
+html.dark:not(.her) #floating-menu > div,
+html.dark:not(.her) [id^="floating-buttons-"] > div,
+html.dark:not(.her) .tippy-box[data-theme~="dark"],
+html.dark:not(.her) .tippy-box[data-theme~="menu"],
+html.dark:not(.her) .tippy-box[data-theme~="select"] {
+	background:
+		linear-gradient(180deg, rgba(16, 32, 51, 0.98), rgba(7, 16, 27, 0.98)) !important;
+	border-color: var(--indieark-border-soft) !important;
+	color: var(--indieark-text-primary) !important;
+	box-shadow:
+		0 18px 56px rgba(0, 0, 0, 0.42),
+		0 0 0 1px rgba(102, 192, 244, 0.08) !important;
+}
+
+html.dark:not(.her) #bubble-menu button,
+html.dark:not(.her) #floating-menu button,
+html.dark:not(.her) [id^="floating-buttons-"] button {
+	color: var(--indieark-text-secondary) !important;
+}
+
+html.dark:not(.her) #bubble-menu button:hover,
+html.dark:not(.her) #floating-menu button:hover,
+html.dark:not(.her) [id^="floating-buttons-"] button:hover {
+	background-color: var(--indieark-surface-hover) !important;
+	color: var(--indieark-text-primary) !important;
+}
+
+html.dark:not(.her) #bubble-menu button[class*="dark:bg-gray-700"],
+html.dark:not(.her) #floating-menu button[class*="dark:bg-gray-700"] {
+	background-color: var(--indieark-surface-selected) !important;
+	color: var(--indieark-text-primary) !important;
+}
+
+html.dark:not(.her) [role="menu"] > div[class*="rounded-2xl"],
+html.dark:not(.her) [role="menu"] [class*="rounded-2xl"][class*="dark:bg-gray-850"],
+html.dark:not(.her) [role="menu"] [class*="rounded-2xl"][class*="dark:bg-gray-900"],
+html.dark:not(.her) [role="listbox"],
+html.dark:not(.her) [class*="z-50"][class*="shadow-lg"][class*="dark:bg-gray-850"],
+html.dark:not(.her) [class*="z-[9999]"][class*="dark:bg-gray-900"],
+html.dark:not(.her) [class*="z-[9999999]"][class*="dark:bg-gray-850"],
+html.dark:not(.her) [class*="max-h-72"][class*="dark:bg-gray-850"],
+html.dark:not(.her) [class*="min-w-70"][class*="dark:bg-gray-850"],
+html.dark:not(.her) [class*="w-70"][class*="dark:bg-gray-850"] {
+	background:
+		linear-gradient(180deg, rgba(13, 24, 39, 0.98), rgba(7, 16, 27, 0.99)) !important;
+	border-color: var(--indieark-border-soft) !important;
+	color: var(--indieark-text-primary) !important;
+	box-shadow:
+		0 18px 56px rgba(0, 0, 0, 0.44),
+		0 0 0 1px rgba(102, 192, 244, 0.08) !important;
+}
+
+html.dark:not(.her) [role="menu"] button,
+html.dark:not(.her) [role="listbox"] button,
+html.dark:not(.her) [class*="max-h-72"][class*="dark:bg-gray-850"] button,
+html.dark:not(.her) [class*="min-w-70"][class*="dark:bg-gray-850"] button,
+html.dark:not(.her) [class*="w-70"][class*="dark:bg-gray-850"] button {
+	color: var(--indieark-text-primary) !important;
+}
+
+html.dark:not(.her) [role="menu"] button:hover,
+html.dark:not(.her) [role="listbox"] button:hover,
+html.dark:not(.her) [class*="max-h-72"][class*="dark:bg-gray-850"] button:hover,
+html.dark:not(.her) [class*="min-w-70"][class*="dark:bg-gray-850"] button:hover,
+html.dark:not(.her) [class*="w-70"][class*="dark:bg-gray-850"] button:hover {
+	background-color: var(--indieark-surface-hover) !important;
+	color: var(--indieark-text-primary) !important;
+}
+
+html.dark:not(.her) [role="menu"] .selected-command-option-button,
+html.dark:not(.her) [role="listbox"] .selected-command-option-button,
+html.dark:not(.her) [class*="max-h-72"][class*="dark:bg-gray-850"] .selected-command-option-button,
+html.dark:not(.her) [class*="min-w-70"][class*="dark:bg-gray-850"] .selected-command-option-button,
+html.dark:not(.her) [class*="w-70"][class*="dark:bg-gray-850"] .selected-command-option-button {
+	background-color: var(--indieark-surface-selected) !important;
+	color: var(--indieark-text-primary) !important;
+}
+
+html.dark:not(.her) [role="menu"] [class*="text-gray-500"],
+html.dark:not(.her) [role="listbox"] [class*="text-gray-500"],
+html.dark:not(.her) [class*="max-h-72"][class*="dark:bg-gray-850"] [class*="text-gray-500"],
+html.dark:not(.her) [class*="min-w-70"][class*="dark:bg-gray-850"] [class*="text-gray-500"],
+html.dark:not(.her) [class*="w-70"][class*="dark:bg-gray-850"] [class*="text-gray-500"] {
+	color: rgba(199, 213, 224, 0.66) !important;
+}
+
+html.dark:not(.her) [role="switch"] {
+	background-color: rgba(16, 32, 51, 0.72) !important;
+	outline-color: var(--indieark-border-soft) !important;
+}
+
+html.dark:not(.her) [role="switch"][data-state="checked"],
+html.dark:not(.her) [role="switch"][class*="bg-emerald"],
+html.dark:not(.her) [role="switch"][class*="dark:bg-emerald"] {
+	background:
+		linear-gradient(90deg, #0e8fa7, var(--indieark-primary)) !important;
+	box-shadow:
+		0 0 0 1px rgba(102, 192, 244, 0.3),
+		0 0 16px rgba(102, 192, 244, 0.18) !important;
+}
+
+html.dark:not(.her) [role="switch"][data-state="unchecked"] {
+	background-color: rgba(7, 16, 27, 0.72) !important;
+	box-shadow: inset 0 0 0 1px var(--indieark-border-soft) !important;
+}
+
+html.dark:not(.her) [role="switch"] [data-state] {
+	background-color: var(--indieark-text-primary) !important;
+}
+
 body > div[style*="display: contents"] > *,
 #splash-screen {
 	position: relative;
@@ -105,6 +513,52 @@ body > div[style*="display: contents"] > *,
 	background-color: var(--indieark-bg-nav) !important;
 	border-right: 1px solid var(--indieark-border-soft);
 	backdrop-filter: blur(18px);
+}
+
+html.dark:not(.her) #sidebar,
+html.dark:not(.her) nav[aria-label="App navigation"] {
+	background:
+		linear-gradient(180deg, rgba(7, 16, 27, 0.92), rgba(3, 8, 14, 0.94)) !important;
+}
+
+html.dark:not(.her) #sidebar .sidebar,
+html.dark:not(.her) #sidebar .sidebar-bg-gradient-to-b,
+html.dark:not(.her) #sidebar .sidebar-bg-gradient-to-t {
+	background:
+		linear-gradient(180deg, rgba(7, 16, 27, 0.94), rgba(7, 16, 27, 0)) !important;
+}
+
+html.dark:not(.her) #sidebar .sidebar-bg-gradient-to-t {
+	background:
+		linear-gradient(0deg, rgba(7, 16, 27, 0.94), rgba(7, 16, 27, 0)) !important;
+}
+
+html.dark:not(.her) #sidebar [class*="dark:hover:bg-gray-900"]:hover,
+html.dark:not(.her) #sidebar [class*="dark:hover:bg-gray-850"]:hover,
+html.dark:not(.her) #sidebar [class*="dark:hover:bg-gray-800"]:hover,
+html.dark:not(.her) #sidebar [class*="hover:bg-gray-100"]:hover,
+html.dark:not(.her) #sidebar [class*="hover:bg-gray-50"]:hover,
+html.dark:not(.her) nav[aria-label="App navigation"] button:hover {
+	background-color: var(--indieark-surface-hover) !important;
+	color: var(--indieark-text-primary) !important;
+}
+
+html.dark:not(.her) #sidebar .selected,
+html.dark:not(.her) #sidebar [class*=" selected"],
+html.dark:not(.her) #sidebar [class*="dark:bg-gray-900"].selected,
+html.dark:not(.her) #sidebar [class*="dark:bg-gray-800"].selected {
+	background-color: var(--indieark-surface-selected) !important;
+	color: var(--indieark-text-primary) !important;
+}
+
+html.dark:not(.her) #sidebar [class*="dark:border-gray-850"],
+html.dark:not(.her) #sidebar [class*="dark:border-gray-900"],
+html.dark:not(.her) nav[aria-label="App navigation"] [class*="dark:border-gray-900"] {
+	border-color: var(--indieark-border-soft) !important;
+}
+
+html.dark:not(.her) #sidebar-resizer:hover {
+	background-color: var(--indieark-primary-glow) !important;
 }
 
 #navbar-bg-gradient-to-b {
@@ -133,7 +587,7 @@ body > div[style*="display: contents"] > *,
 }
 
 #sidebar-webui-name::after {
-	content: "Indieark Chat";
+	content: "IndieArk Chat";
 	font-size: 0.95rem;
 }
 
@@ -151,7 +605,7 @@ body > div[style*="display: contents"] > *,
 	}
 
 	#new-chat-button + nav > div > div > div::after {
-		content: "Indieark Chat";
+		content: "IndieArk Chat";
 		display: block;
 		flex: 0 0 auto;
 		margin: 0.1rem 0.6rem 0 0;

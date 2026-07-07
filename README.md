@@ -17,6 +17,7 @@
 .
 ├── upstream/open-webui/     # 官方 open-webui/open-webui subtree
 ├── compat/                  # IndieArk 兼容层配置和未来补丁入口
+├── deploy/                  # Portainer/Compose 部署层自定义资产
 ├── docs/                    # 当前私库文档
 ├── scripts/                 # 上游同步和兼容层验证脚本
 ├── plans/                   # 计划和归档
@@ -46,6 +47,7 @@ bash scripts/verify-compat.sh
 - 必须修改上游源码时，先在 `docs/compatibility-layer.md` 登记 subtree 例外，再做最小补丁和回归验证。
 - 上游同步必须 compare-first；无真实 upstream delta 时 no-op，不构建、不提交、不推送。
 - 测试环境 Portainer stack 变更、镜像切换、重建或容器重启必须另行确认。
+- 品牌、favicon/PWA/开屏图、`custom.css` 和 `loader.js` 由根层部署资产与 `docker-compose.yml` 的启动 bootstrap 生成；不通过 bind mount 单个 static 文件，也不修改上游源码。
 
 文档入口见 [docs/README.md](docs/README.md)。上游同步入口见 [UPSTREAMS.md](UPSTREAMS.md)。
 

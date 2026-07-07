@@ -7,6 +7,7 @@
 | 主题 | 位置 | 状态 |
 | --- | --- | --- |
 | Portainer stable compose | `docker-compose.yml` | 已启用，保持测试环境当前语义 |
+| 品牌与全局 UI 皮肤启动生成 | `deploy/open-webui/static/`, `docker-compose.yml` command bootstrap | 已启用，不改上游源码、不做 static bind mount |
 | 本地构建 override | `docker-compose.local.yml` | 已提供 |
 | 私有镜像薄包装 | `Dockerfile` | 已提供，仍基于公共上游镜像 |
 | Web Search 环境模板 | `compat/config/web-search.env.example` | 已提供，不含 secret |
@@ -28,8 +29,9 @@
 ## 优先级
 
 1. Compose/env/Portainer 配置。
-2. `compat/` 下的 pipe/function/adapter 或 wrapper。
-3. entrypoint 或 post-build patch。
-4. 已登记的最小 upstream subtree 补丁。
+2. `deploy/` 下的部署层静态资产和 entrypoint/bootstrap 包装。
+3. `compat/` 下的 pipe/function/adapter 或 wrapper。
+4. entrypoint 或 post-build patch。
+5. 已登记的最小 upstream subtree 补丁。
 
 Web Search 和 OpenAI hosted tool 适配也遵循该顺序。
