@@ -1,0 +1,178 @@
+/* IndieArk deployment skin: color tone, dither backdrop, and brand chrome only. */
+:root {
+	--indieark-bg-base: #0b0f19;
+	--indieark-bg-deep: #171a21;
+	--indieark-bg-nav: rgba(15, 23, 42, 0.72);
+	--indieark-bg-shell: rgba(11, 15, 25, 0.7);
+	--indieark-bg-shell-mid: rgba(11, 15, 25, 0.42);
+	--indieark-primary: #66c0f4;
+	--indieark-primary-glow: rgba(102, 192, 244, 0.28);
+	--indieark-text-primary: #f2f7fb;
+	--indieark-text-secondary: #c7d5e0;
+	--indieark-border-soft: rgba(102, 192, 244, 0.14);
+	--indieark-dither-opacity: 0.82;
+	--indieark-dither-blend: normal;
+}
+
+html.light {
+	--indieark-bg-base: #f8f9fa;
+	--indieark-bg-deep: #ffffff;
+	--indieark-bg-nav: rgba(255, 255, 255, 0.82);
+	--indieark-bg-shell: rgba(248, 249, 250, 0.76);
+	--indieark-bg-shell-mid: rgba(248, 249, 250, 0.46);
+	--indieark-primary: #4facfe;
+	--indieark-primary-glow: rgba(79, 172, 254, 0.16);
+	--indieark-text-primary: #2a2925;
+	--indieark-text-secondary: #5f5c55;
+	--indieark-border-soft: rgba(79, 172, 254, 0.16);
+	--indieark-dither-opacity: 0.46;
+	--indieark-dither-blend: multiply;
+}
+
+html.indieark-oled-dark {
+	--indieark-bg-base: #000000;
+	--indieark-bg-deep: #070a10;
+	--indieark-bg-nav: rgba(4, 8, 14, 0.76);
+	--indieark-bg-shell: rgba(0, 0, 0, 0.68);
+	--indieark-bg-shell-mid: rgba(0, 0, 0, 0.42);
+}
+
+html,
+body {
+	min-height: 100%;
+	background: var(--indieark-bg-base);
+}
+
+body {
+	position: relative;
+	color: var(--indieark-text-primary);
+}
+
+body::before {
+	content: "";
+	position: fixed;
+	inset: 0;
+	z-index: 0;
+	pointer-events: none;
+	opacity: var(--indieark-dither-opacity);
+	mix-blend-mode: var(--indieark-dither-blend);
+	background:
+		radial-gradient(circle at 18% 18%, var(--indieark-primary-glow), transparent 22rem),
+		radial-gradient(circle at 82% 6%, rgba(76, 107, 34, 0.12), transparent 19rem),
+		radial-gradient(circle at 70% 86%, rgba(102, 192, 244, 0.1), transparent 24rem),
+		linear-gradient(135deg, rgba(255, 255, 255, 0.055) 25%, transparent 25%) 0 0 / 4px 4px,
+		linear-gradient(225deg, rgba(255, 255, 255, 0.045) 25%, transparent 25%) 0 0 / 4px 4px,
+		linear-gradient(180deg, var(--indieark-bg-deep), var(--indieark-bg-base));
+}
+
+html.light body::before {
+	background:
+		radial-gradient(circle at 20% 16%, rgba(79, 172, 254, 0.16), transparent 22rem),
+		radial-gradient(circle at 84% 8%, rgba(196, 224, 255, 0.18), transparent 18rem),
+		linear-gradient(135deg, rgba(79, 172, 254, 0.08) 25%, transparent 25%) 0 0 / 4px 4px,
+		linear-gradient(225deg, rgba(42, 41, 37, 0.045) 25%, transparent 25%) 0 0 / 4px 4px,
+		linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(248, 249, 250, 0.92));
+}
+
+body::after {
+	content: "";
+	position: fixed;
+	inset: 0;
+	z-index: 0;
+	pointer-events: none;
+	opacity: 0.08;
+	background-image:
+		repeating-linear-gradient(0deg, transparent 0 3px, rgba(102, 192, 244, 0.26) 3px 4px),
+		repeating-linear-gradient(90deg, transparent 0 3px, rgba(102, 192, 244, 0.18) 3px 4px);
+}
+
+html.light body::after {
+	opacity: 0.035;
+}
+
+body > div[style*="display: contents"] > *,
+#splash-screen {
+	position: relative;
+	z-index: 1;
+}
+
+.app > div[class*="bg-white"][class*="dark:bg-gray-900"],
+#auth-page > div:first-child {
+	background-color: var(--indieark-bg-shell) !important;
+}
+
+#sidebar {
+	background-color: var(--indieark-bg-nav) !important;
+	border-right: 1px solid var(--indieark-border-soft);
+	backdrop-filter: blur(18px);
+}
+
+#navbar-bg-gradient-to-b {
+	background:
+		linear-gradient(
+			to bottom,
+			var(--indieark-bg-shell) 0%,
+			var(--indieark-bg-shell-mid) 40%,
+			transparent 97%
+		) !important;
+}
+
+#sidebar .sidebar-new-chat-icon {
+	width: 1.65rem !important;
+	height: 1.65rem !important;
+	border-radius: 0.5rem !important;
+	box-shadow: 0 0 0 1px var(--indieark-border-soft), 0 0 18px var(--indieark-primary-glow);
+}
+
+#sidebar-webui-name {
+	color: var(--indieark-text-primary) !important;
+	font-size: 0 !important;
+	font-weight: 700 !important;
+	letter-spacing: 0 !important;
+	white-space: nowrap;
+}
+
+#sidebar-webui-name::after {
+	content: "Indieark Chat";
+	font-size: 0.95rem;
+}
+
+@media (max-width: 767px) {
+	#new-chat-button + nav > div > div > div::before {
+		content: "";
+		display: block;
+		flex: 0 0 auto;
+		width: 1.65rem;
+		height: 1.65rem;
+		margin: 0.1rem 0.55rem 0 0.15rem;
+		border-radius: 0.5rem;
+		background: url("/static/favicon.png") center / cover no-repeat;
+		box-shadow: 0 0 0 1px var(--indieark-border-soft), 0 0 18px var(--indieark-primary-glow);
+	}
+
+	#new-chat-button + nav > div > div > div::after {
+		content: "Indieark Chat";
+		display: block;
+		flex: 0 0 auto;
+		margin: 0.1rem 0.6rem 0 0;
+		color: var(--indieark-text-primary);
+		font-size: 0.95rem;
+		font-weight: 700;
+		line-height: 1.65rem;
+		letter-spacing: 0;
+		white-space: nowrap;
+	}
+}
+
+@media (max-width: 420px) {
+	#new-chat-button + nav > div > div > div::after {
+		content: "Chat";
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	body::before,
+	body::after {
+		animation: none !important;
+	}
+}

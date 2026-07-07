@@ -7,11 +7,26 @@ services:
       - "3000:8080"
     volumes:
       - open-webui:/app/backend/data
+      - ./deploy/open-webui/static/custom.css:/app/backend/open_webui/static/custom.css:ro
+      - ./deploy/open-webui/static/loader.js:/app/backend/open_webui/static/loader.js:ro
+      - ./deploy/open-webui/static/manifest.json:/app/backend/open_webui/static/manifest.json:ro
+      - ./deploy/open-webui/static/favicon.png:/app/backend/open_webui/static/favicon.png:ro
+      - ./deploy/open-webui/static/favicon-96x96.png:/app/backend/open_webui/static/favicon-96x96.png:ro
+      - ./deploy/open-webui/static/favicon.svg:/app/backend/open_webui/static/favicon.svg:ro
+      - ./deploy/open-webui/static/favicon.ico:/app/backend/open_webui/static/favicon.ico:ro
+      - ./deploy/open-webui/static/favicon-dark.png:/app/backend/open_webui/static/favicon-dark.png:ro
+      - ./deploy/open-webui/static/apple-touch-icon.png:/app/backend/open_webui/static/apple-touch-icon.png:ro
+      - ./deploy/open-webui/static/splash.png:/app/backend/open_webui/static/splash.png:ro
+      - ./deploy/open-webui/static/splash-dark.png:/app/backend/open_webui/static/splash-dark.png:ro
+      - ./deploy/open-webui/static/logo.png:/app/backend/open_webui/static/logo.png:ro
+      - ./deploy/open-webui/static/web-app-manifest-192x192.png:/app/backend/open_webui/static/web-app-manifest-192x192.png:ro
+      - ./deploy/open-webui/static/web-app-manifest-512x512.png:/app/backend/open_webui/static/web-app-manifest-512x512.png:ro
     environment:
       WEBUI_SECRET_KEY: "${WEBUI_SECRET_KEY:?set WEBUI_SECRET_KEY in Portainer stack environment variables}"
       OLLAMA_BASE_URL: "http://host.docker.internal:11434"
       CHAT_STREAM_RESPONSE_CHUNK_MAX_BUFFER_SIZE: "${CHAT_STREAM_RESPONSE_CHUNK_MAX_BUFFER_SIZE:-10485760}"
       AIOHTTP_READ_BUFSIZE: "${AIOHTTP_READ_BUFSIZE:-1048576}"
+      EXTERNAL_PWA_MANIFEST_URL: "http://127.0.0.1:8080/static/manifest.json"
       SCARF_NO_ANALYTICS: "true"
       DO_NOT_TRACK: "true"
       ANONYMIZED_TELEMETRY: "false"
